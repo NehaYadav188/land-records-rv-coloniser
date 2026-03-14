@@ -256,7 +256,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn && (
-                <button onClick={() => window.location.href = '/#/admin/login'} className="hover:text-emerald-200 transition-colors">
+                <button onClick={() => window.location.href = '/#/admin'} className="hover:text-emerald-200 transition-colors">
                   Admin Portal
                 </button>
               )}
@@ -287,7 +287,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn && (
-                <button onClick={() => { window.location.href = '/#/admin/login'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
+                <button onClick={() => { window.location.href = '/#/admin'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                   Admin Portal
                 </button>
               )}
@@ -645,7 +645,7 @@ Financial Advice & Loan Information
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-gray-400 hover:text-white transition-colors">🏠 Properties</button></li>
                 {isAdminLoggedIn && (
-                  <li><button onClick={() => window.location.href = '/#/admin/login'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                  <li><button onClick={() => window.location.href = '/#/admin'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
                 )}
                 <li><button onClick={() => handleContact('financial')} className="text-gray-400 hover:text-white transition-colors">💼 Financial Advice</button></li>
                 <li><button onClick={() => window.location.href = 'https://wa.me/9415058167'} className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</button></li>

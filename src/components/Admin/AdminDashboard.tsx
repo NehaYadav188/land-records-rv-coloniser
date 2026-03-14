@@ -61,6 +61,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleAddPlot = (landId: string) => {
     setSelectedLand(landRecords.find(land => land.id === landId) || null);
+    setSelectedPlot(null); // Clear selected plot for new plot
     setShowForm(true);
   };
 
@@ -190,7 +191,7 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               {/* Prominent User Site Button */}
               <button
-                onClick={() => window.location.href = '/#/'}
+                onClick={() => window.location.href = window.location.origin}
                 className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-lg font-bold hover:from-emerald-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -395,74 +396,7 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* New Land Form */}
-            {showNewLandForm && (
-              <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h3 className="text-lg font-semibold mb-4">Add New Land</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Land Number</label>
-                    <input
-                      type="text"
-                      value={newLandData.landNumber}
-                      onChange={(e) => setNewLandData(prev => ({ ...prev, landNumber: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., LAND-001"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Total Area</label>
-                    <input
-                      type="number"
-                      value={newLandData.totalArea}
-                      onChange={(e) => setNewLandData(prev => ({ ...prev, totalArea: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., 10000"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Road Area</label>
-                    <input
-                      type="number"
-                      value={newLandData.roadArea}
-                      onChange={(e) => setNewLandData(prev => ({ ...prev, roadArea: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., 500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-                    <select
-                      value={newLandData.unit}
-                      onChange={(e) => setNewLandData(prev => ({ ...prev, unit: e.target.value as any }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="sqft">Square Feet</option>
-                      <option value="sqm">Square Meters</option>
-                      <option value="yard">Square Yards</option>
-                      <option value="acre">Acres</option>
-                      <option value="kanal">Kanal</option>
-                      <option value="bigha">Bigha</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3 mt-4">
-                  <button
-                    onClick={() => setShowNewLandForm(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleAddNewLand}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                  >
-                    Add Land
-                  </button>
-                </div>
-              </div>
-            )}
-
+            
             {/* Land Records Display */}
             <div className="space-y-6">
               {landRecords.map((land) => (
@@ -761,6 +695,92 @@ const AdminDashboard: React.FC = () => {
           initialData={selectedPlot || undefined}
           isEdit={!!selectedPlot}
         />
+      )}
+
+      {/* New Land Form Modal */}
+      {showNewLandForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-900">Add New Land</h3>
+                <button
+                  onClick={() => setShowNewLandForm(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Land Number</label>
+                  <input
+                    type="text"
+                    value={newLandData.landNumber}
+                    onChange={(e) => setNewLandData(prev => ({ ...prev, landNumber: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., LAND-001"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Total Area</label>
+                  <input
+                    type="number"
+                    value={newLandData.totalArea}
+                    onChange={(e) => setNewLandData(prev => ({ ...prev, totalArea: parseFloat(e.target.value) || 0 }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., 10000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Road Area</label>
+                  <input
+                    type="number"
+                    value={newLandData.roadArea}
+                    onChange={(e) => setNewLandData(prev => ({ ...prev, roadArea: parseFloat(e.target.value) || 0 }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., 500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                  <select
+                    value={newLandData.unit}
+                    onChange={(e) => setNewLandData(prev => ({ ...prev, unit: e.target.value as any }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="sqft">Square Feet</option>
+                    <option value="sqm">Square Meters</option>
+                    <option value="yard">Square Yards</option>
+                    <option value="acre">Acres</option>
+                    <option value="kanal">Kanal</option>
+                    <option value="bigha">Bigha</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-4 mt-8">
+                <button
+                  onClick={() => setShowNewLandForm(false)}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddNewLand}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  Add Land
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
