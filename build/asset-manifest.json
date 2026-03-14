@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/land-records-rv-coloniser/static/css/main.da7b5860.css",
-    "main.js": "/land-records-rv-coloniser/static/js/main.7eafb202.js",
+    "main.css": "/land-records-rv-coloniser/static/css/main.93ee93be.css",
+    "main.js": "/land-records-rv-coloniser/static/js/main.4795b2b0.js",
     "index.html": "/land-records-rv-coloniser/index.html",
-    "main.da7b5860.css.map": "/land-records-rv-coloniser/static/css/main.da7b5860.css.map",
-    "main.7eafb202.js.map": "/land-records-rv-coloniser/static/js/main.7eafb202.js.map"
+    "main.93ee93be.css.map": "/land-records-rv-coloniser/static/css/main.93ee93be.css.map",
+    "main.4795b2b0.js.map": "/land-records-rv-coloniser/static/js/main.4795b2b0.js.map"
   },
   "entrypoints": [
-    "static/css/main.da7b5860.css",
-    "static/js/main.7eafb202.js"
+    "static/css/main.93ee93be.css",
+    "static/js/main.4795b2b0.js"
   ]
 }

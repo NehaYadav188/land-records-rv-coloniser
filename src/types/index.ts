@@ -59,6 +59,10 @@ export interface LandRecord {
     value: number;
     unit: AreaUnit;
   };
+  roadArea: {
+    value: number;
+    unit: AreaUnit;
+  };
   plots: PlotDetails[];
   createdAt?: string;
   updatedAt?: string;

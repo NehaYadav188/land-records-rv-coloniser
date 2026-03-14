@@ -8,6 +8,10 @@ export const mockLandRecords: LandRecord[] = [
       value: 5000,
       unit: 'sqft'
     },
+    roadArea: {
+      value: 500,
+      unit: 'sqft'
+    },
     plots: [
       {
         id: 'plot-001',
@@ -123,6 +127,77 @@ export const mockLandRecords: LandRecord[] = [
     ],
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-02-15T00:00:00Z'
+  },
+  {
+    id: 'land-002',
+    landNumber: 'LAND-002',
+    totalArea: {
+      value: 7500,
+      unit: 'sqft'
+    },
+    roadArea: {
+      value: 750,
+      unit: 'sqft'
+    },
+    plots: [
+      {
+        id: 'plot-003',
+        plotNumber: 'PLOT-002-A',
+        privatePlotNumber: 'PP-003',
+        landArea: {
+          value: 3000,
+          unit: 'sqft'
+        },
+        plotArea: {
+          value: 2800,
+          unit: 'sqft'
+        },
+        size: {
+          length: 50,
+          width: 56,
+          unit: 'sqft'
+        },
+        status: 'sold',
+        possession: true,
+        miscellaneous: {
+          type: 'normal'
+        },
+        dateOfSale: '2024-02-10',
+        dateOfPurchase: '2024-02-15',
+        sellerInfo: {
+          name: 'Robert Johnson',
+          address: '789 Pine St, City',
+          mobileNumber: '+1122334455'
+        },
+        purchaserInfo: {
+          name: 'Alice Brown',
+          address: '321 Maple Rd, Town',
+          mobileNumber: '+5544332211'
+        },
+        sellingDetails: {
+          bankName: 'State Bank',
+          accountNumber: 'ACC003',
+          transactionNumber: 'TXN003',
+          value: 75000,
+          balance: 0,
+          creditedAmount: 75000
+        },
+        purchaseDetails: {
+          bankName: 'State Bank',
+          accountNumber: 'ACC004',
+          transactionNumber: 'TXN004',
+          value: 75000,
+          balance: 0,
+          debitedAmount: 75000
+        },
+        location: {
+          gramSabha: 'Gram Sabha South',
+          fullAddress: 'Next to School, Gram Sabha South'
+        }
+      }
+    ],
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-20T00:00:00Z'
   }
 ];
 

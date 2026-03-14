@@ -168,20 +168,69 @@ Financial Advice & Loan Information
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Home Formation Animation */}
+      {/* Enhanced Home Formation Animation */}
       {showHomeAnimation && (
         <div className="fixed bottom-4 right-4 z-50 animate-home-formation">
-          <div className="relative w-20 h-20">
-            {/* Foundation */}
-            <div className="absolute bottom-0 w-20 h-2 bg-gray-600 animate-fade-in"></div>
-            {/* Walls */}
-            <div className="absolute bottom-2 w-20 h-12 bg-orange-400 animate-slide-up"></div>
-            {/* Roof */}
-            <div className="absolute bottom-14 w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[20px] border-b-red-600 animate-slide-down"></div>
-            {/* Door */}
-            <div className="absolute bottom-2 left-7 w-6 h-8 bg-brown-600 animate-fade-in"></div>
-            {/* Window */}
-            <div className="absolute bottom-8 right-4 w-4 h-4 bg-blue-300 animate-fade-in"></div>
+          <div className="relative w-24 h-24">
+            {/* Ground Preparation */}
+            <div className="absolute bottom-0 w-24 h-1 bg-gray-700 animate-dig-ground"></div>
+            
+            {/* Foundation Pouring */}
+            <div className="absolute bottom-1 w-24 h-3 bg-gray-500 animate-concrete-pour overflow-hidden">
+              <div className="w-full h-full bg-gradient-to-t from-gray-600 to-gray-400 animate-concrete-flow"></div>
+            </div>
+            
+            {/* Wall Building - Brick by Brick */}
+            <div className="absolute bottom-4 w-24 h-14">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex justify-center mb-1">
+                  {[...Array(6)].map((_, j) => (
+                    <div
+                      key={j}
+                      className="w-3 h-2 bg-red-700 border border-red-800 animate-brick-lay"
+                      style={{
+                        animationDelay: `${(i * 6 + j) * 0.1}s`,
+                        opacity: 0
+                      }}
+                    ></div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            
+            {/* Roof Construction */}
+            <div className="absolute bottom-18 left-2 w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[24px] border-b-red-600 animate-roof-build"></div>
+            
+            {/* Door Installation */}
+            <div className="absolute bottom-4 left-9 w-6 h-10 bg-amber-800 animate-door-install border-2 border-amber-900">
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-yellow-400 rounded-full animate-knob-appear"></div>
+            </div>
+            
+            {/* Window Installation */}
+            <div className="absolute bottom-8 right-4 w-5 h-5 bg-sky-300 animate-window-install border-2 border-sky-400">
+              <div className="grid grid-cols-2 gap-px p-1">
+                <div className="bg-sky-200"></div>
+                <div className="bg-sky-200"></div>
+                <div className="bg-sky-200"></div>
+                <div className="bg-sky-200"></div>
+              </div>
+            </div>
+            
+            {/* Chimney */}
+            <div className="absolute bottom-20 right-3 w-3 h-6 bg-red-800 animate-chimney-build"></div>
+            
+            {/* Smoke Animation */}
+            <div className="absolute bottom-26 right-3 w-2 h-4">
+              <div className="w-full h-full bg-gray-400 rounded-full animate-smoke-rise opacity-80"></div>
+            </div>
+            
+            {/* Final Touches */}
+            <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-xs text-green-600 animate-plant-grow">🌿</div>
+            <div className="absolute bottom-16 right-6 text-xs text-pink-500 animate-plant-grow" style={{animationDelay: '0.5s'}}>🌸</div>
+            
+            {/* Construction Tools */}
+            <div className="absolute -top-2 -left-2 text-xs animate-tool-float">🔨</div>
+            <div className="absolute -top-2 -right-2 text-xs animate-tool-float" style={{animationDelay: '0.3s'}}>⚒️</div>
           </div>
         </div>
       )}
@@ -207,7 +256,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn && (
-                <button onClick={() => window.location.href = '/#/admin'} className="hover:text-emerald-200 transition-colors">
+                <button onClick={() => window.location.href = '/#/admin/login'} className="hover:text-emerald-200 transition-colors">
                   Admin Portal
                 </button>
               )}
@@ -238,7 +287,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn && (
-                <button onClick={() => { window.location.href = '/#/admin'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
+                <button onClick={() => { window.location.href = '/#/admin/login'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                   Admin Portal
                 </button>
               )}
@@ -279,52 +328,71 @@ Financial Advice & Loan Information
         </div>
       )}
 
-      {/* Dream Home Popup - Smaller Size */}
+      {/* Elegant Dream Home Popup */}
       {showDealPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl animate-dream-home">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-xl relative">
-              <button onClick={() => setShowDealPopup(false)} className="absolute top-2 right-2 text-white hover:text-gray-200">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="text-center">
-                <div className="text-3xl mb-2">🏠</div>
-                <h2 className="text-xl font-bold">Your Dream Home Awaits!</h2>
-                <p className="text-sm opacity-90">Fresh properties available</p>
-              </div>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              <div className="text-center">
-                <p className="text-lg font-semibold text-gray-800">✨ New Arrivals</p>
-                <p className="text-sm text-gray-600">Check out our latest properties</p>
-              </div>
-
-              {freshProperties.slice(0, 2).map((plot) => (
-                <div key={plot.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h4 className="font-bold text-gray-900">{plot.plotNumber}</h4>
-                      <p className="text-xs text-gray-600">{plot.location.gramSabha}</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(plot.status)}`}>
-                      {plot.status}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-600 mb-2">
-                    Area: {plot.plotArea.value} {plot.plotArea.unit}
-                  </div>
-                  <button onClick={() => { setSelectedPlot(plot); setShowDealPopup(false); }} className="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors">
-                    View Details →
-                  </button>
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl animate-elegant-popup">
+            <div className="relative">
+              {/* Elegant Header */}
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-t-2xl border-b border-emerald-100">
+                <button onClick={() => setShowDealPopup(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="text-center">
+                  <div className="text-4xl mb-3 animate-icon-bounce">�</div>
+                  <h2 className="text-xl font-semibold text-gray-800 mb-1">Discover Your Dream Home</h2>
+                  <p className="text-sm text-gray-600">New premium properties just listed</p>
                 </div>
-              ))}
+              </div>
+              
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div className="text-center">
+                  <div className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+                    <span className="mr-1">✨</span> Fresh Arrivals
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">Explore our latest offerings</p>
+                </div>
 
-              <button onClick={() => setShowDealPopup(false)} className="w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors text-sm">
-                Browse All Properties
-              </button>
+                {freshProperties.slice(0, 2).map((plot, index) => (
+                  <div key={plot.id} className="border border-gray-200 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white hover:shadow-md transition-all duration-300 hover:border-emerald-300" style={{animationDelay: `${index * 0.1}s`}}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 text-sm">{plot.plotNumber}</h4>
+                        <p className="text-xs text-gray-500 mt-1">{plot.location.gramSabha}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(plot.status)}`}>
+                        {plot.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-xs text-gray-600">
+                        <span className="inline-flex items-center">
+                          📐 {plot.plotArea.value} {plot.plotArea.unit}
+                        </span>
+                      </div>
+                      <div className="text-xs font-medium text-emerald-600">
+                        ₹{(plot.sellingDetails.value / 100000).toFixed(1)}L
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => { setSelectedPlot(plot); setShowDealPopup(false); }} 
+                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-2 rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 transform hover:scale-[1.02]"
+                    >
+                      Explore Property
+                    </button>
+                  </div>
+                ))}
+
+                <button 
+                  onClick={() => setShowDealPopup(false)} 
+                  className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
+                >
+                  View All Properties
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -376,27 +444,40 @@ Financial Advice & Loan Information
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {paginatedPlots.map((plot) => (
-            <div key={`${plot.landNumber}-${plot.id}`} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <div className="h-48 bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center relative">
-                <div className="text-white text-center">
-                  <div className="text-2xl font-bold">{plot.plotNumber}</div>
-                  <div className="text-sm opacity-90">{plot.landNumber}</div>
-                </div>
-                <span className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(plot.status)}`}>
-                  {plot.status}
-                </span>
-              </div>
-
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{plot.plotNumber}</h3>
-                <p className="text-sm text-gray-500 mb-4">{plot.location.gramSabha}</p>
-
-                <div className="space-y-2 mb-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Area:</span>
-                    <span className="font-medium">{formatArea(plot.plotArea.value, plot.plotArea.unit)}</span>
+          {paginatedPlots.map((plot) => {
+            const landRecord = landRecords.find(land => land.landNumber === plot.landNumber);
+            const hasRoadArea = landRecord && landRecord.roadArea && landRecord.roadArea.value > 0;
+            
+            return (
+            <div key={`${plot.landNumber}-${plot.id}`} className={`relative ${hasRoadArea ? 'p-2 bg-gray-300 rounded-lg' : ''} hover:shadow-2xl transition-all transform hover:-translate-y-1`}>
+              {hasRoadArea && (
+                <div className="absolute inset-0 border-4 border-gray-400 rounded-lg animate-road-pulse"></div>
+              )}
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden relative z-10">
+                <div className="h-48 bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center relative">
+                  <div className="text-white text-center">
+                    <div className="text-2xl font-bold">{plot.plotNumber}</div>
+                    <div className="text-sm opacity-90">{plot.landNumber}</div>
                   </div>
+                  <span className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(plot.status)}`}>
+                    {plot.status}
+                  </span>
+                  {hasRoadArea && (
+                    <div className="absolute bottom-2 left-2 bg-white bg-opacity-90 px-2 py-1 rounded text-xs font-medium text-gray-700">
+                      🛣️ Road: {landRecord.roadArea.value} {landRecord.roadArea.unit}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{plot.plotNumber}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{plot.location.gramSabha}</p>
+
+                  <div className="space-y-2 mb-4 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Area:</span>
+                      <span className="font-medium">{formatArea(plot.plotArea.value, plot.plotArea.unit)}</span>
+                    </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Size:</span>
                     <span className="font-medium">{plot.size.length}×{plot.size.width} {plot.size.unit}</span>
@@ -427,7 +508,9 @@ Financial Advice & Loan Information
                 </div>
               </div>
             </div>
-          ))}
+            </div>
+          );
+          })}
         </div>
 
         {/* Pagination */}
@@ -562,7 +645,7 @@ Financial Advice & Loan Information
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-gray-400 hover:text-white transition-colors">🏠 Properties</button></li>
                 {isAdminLoggedIn && (
-                  <li><button onClick={() => window.location.href = '/#/admin'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                  <li><button onClick={() => window.location.href = '/#/admin/login'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
                 )}
                 <li><button onClick={() => handleContact('financial')} className="text-gray-400 hover:text-white transition-colors">💼 Financial Advice</button></li>
                 <li><button onClick={() => window.location.href = 'https://wa.me/9415058167'} className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</button></li>
@@ -597,11 +680,69 @@ Financial Advice & Loan Information
           from { transform: translateY(-20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
-        @keyframes dream-home {
-          0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
-          50% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+        @keyframes elegant-popup {
+          0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes icon-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        
+        /* Enhanced Home Formation Animations */
+        @keyframes dig-ground {
+          0% { width: 0; opacity: 0; }
+          100% { width: 100%; opacity: 1; }
+        }
+        @keyframes concrete-pour {
+          0% { height: 0; opacity: 0; }
+          100% { height: 100%; opacity: 1; }
+        }
+        @keyframes concrete-flow {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(0); }
+        }
+        @keyframes brick-lay {
+          0% { opacity: 0; transform: scale(0.8); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes roof-build {
+          0% { transform: scale(0) rotate(180deg); opacity: 0; }
           100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
+        @keyframes door-install {
+          0% { transform: translateX(-20px); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes window-install {
+          0% { transform: scale(0) rotate(45deg); opacity: 0; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes chimney-build {
+          0% { height: 0; opacity: 0; }
+          100% { height: 100%; opacity: 1; }
+        }
+        @keyframes smoke-rise {
+          0% { transform: translateY(0) scale(1); opacity: 0.8; }
+          100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
+        }
+        @keyframes plant-grow {
+          0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes knob-appear {
+          0% { transform: scale(0); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes tool-float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-5px) rotate(10deg); }
+        }
+        @keyframes road-pulse {
+          0%, 100% { border-color: rgb(156 163 175); opacity: 0.8; }
+          50% { border-color: rgb(107 114 128); opacity: 1; }
+        }
+        
         .animate-fade-in {
           animation: fade-in 0.5s ease-out;
         }
@@ -611,11 +752,53 @@ Financial Advice & Loan Information
         .animate-slide-down {
           animation: slide-down 0.7s ease-out;
         }
-        .animate-dream-home {
-          animation: dream-home 0.8s ease-out;
+        .animate-elegant-popup {
+          animation: elegant-popup 0.4s ease-out;
+        }
+        .animate-icon-bounce {
+          animation: icon-bounce 2s ease-in-out infinite;
         }
         .animate-home-formation {
           animation: fade-in 0.5s ease-out;
+        }
+        .animate-dig-ground {
+          animation: dig-ground 0.3s ease-out;
+        }
+        .animate-concrete-pour {
+          animation: concrete-pour 0.5s ease-out 0.2s both;
+        }
+        .animate-concrete-flow {
+          animation: concrete-flow 1s ease-in-out infinite;
+        }
+        .animate-brick-lay {
+          animation: brick-lay 0.3s ease-out both;
+        }
+        .animate-roof-build {
+          animation: roof-build 0.4s ease-out 0.8s both;
+        }
+        .animate-door-install {
+          animation: door-install 0.3s ease-out 1s both;
+        }
+        .animate-window-install {
+          animation: window-install 0.3s ease-out 1.2s both;
+        }
+        .animate-chimney-build {
+          animation: chimney-build 0.3s ease-out 1.4s both;
+        }
+        .animate-smoke-rise {
+          animation: smoke-rise 2s ease-out 1.6s infinite;
+        }
+        .animate-plant-grow {
+          animation: plant-grow 0.4s ease-out 1.8s both;
+        }
+        .animate-knob-appear {
+          animation: knob-appear 0.2s ease-out 1.5s both;
+        }
+        .animate-tool-float {
+          animation: tool-float 3s ease-in-out infinite;
+        }
+        .animate-road-pulse {
+          animation: road-pulse 2s ease-in-out infinite;
         }
       `}</style>
     </div>
