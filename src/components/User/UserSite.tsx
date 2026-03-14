@@ -4,10 +4,8 @@ import { mockLandRecords } from '../../data/mockData';
 import { formatArea } from '../../utils/areaConversion';
 import SiteVisitModal from './SiteVisitModal';
 import Logo from '../Logo';
-import { useNavigate } from 'react-router-dom';
 
 const UserSite: React.FC = () => {
-  const navigate = useNavigate();
   const [landRecords] = useState<LandRecord[]>(() => {
     const saved = localStorage.getItem('landRecords');
     return saved ? JSON.parse(saved) : mockLandRecords;
@@ -20,6 +18,7 @@ const UserSite: React.FC = () => {
   const [showDealPopup, setShowDealPopup] = useState(false);
   const [showMotivationalBanner, setShowMotivationalBanner] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showHomeAnimation, setShowHomeAnimation] = useState(false);
   const itemsPerPage = 6;
   
   // Check if user has admin session
@@ -35,6 +34,25 @@ const UserSite: React.FC = () => {
         setIsAdminLoggedIn(false);
       }
     }
+  }, []);
+
+  // Show home animation periodically
+  useEffect(() => {
+    const showAnimation = () => {
+      setShowHomeAnimation(true);
+      setTimeout(() => setShowHomeAnimation(false), 5000); // Show for 5 seconds
+    };
+
+    // Show animation every 20 seconds
+    const interval = setInterval(showAnimation, 20000);
+    
+    // Show first animation after 5 seconds
+    const timer = setTimeout(showAnimation, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
   }, []);
 
   // Show deal popup after 2 seconds, but only 3 times total
@@ -113,13 +131,13 @@ Financial Advice & Loan Information
 *I would like to discuss financial options and loan facilities for property purchase.*`;
       
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
+      window.location.href = whatsappUrl;
       return;
     }
 
     if (type === 'call') {
       const callUrl = `tel:${callNumber}`;
-      window.open(callUrl, '_self');
+      window.location.href = callUrl;
       return;
     }
 
@@ -144,12 +162,30 @@ Financial Advice & Loan Information
 • Admin Portal: ${window.location.origin}/#/admin`;
       
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
+      window.location.href = whatsappUrl;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Home Formation Animation */}
+      {showHomeAnimation && (
+        <div className="fixed bottom-4 right-4 z-50 animate-home-formation">
+          <div className="relative w-20 h-20">
+            {/* Foundation */}
+            <div className="absolute bottom-0 w-20 h-2 bg-gray-600 animate-fade-in"></div>
+            {/* Walls */}
+            <div className="absolute bottom-2 w-20 h-12 bg-orange-400 animate-slide-up"></div>
+            {/* Roof */}
+            <div className="absolute bottom-14 w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[20px] border-b-red-600 animate-slide-down"></div>
+            {/* Door */}
+            <div className="absolute bottom-2 left-7 w-6 h-8 bg-brown-600 animate-fade-in"></div>
+            {/* Window */}
+            <div className="absolute bottom-8 right-4 w-4 h-4 bg-blue-300 animate-fade-in"></div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile-Friendly Header */}
       <header className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,21 +206,14 @@ Financial Advice & Loan Information
               <button onClick={() => handleContact('financial')} className="hover:text-emerald-200 transition-colors">
                 Financial Advice
               </button>
-              {isAdminLoggedIn ? (
-                <button onClick={() => navigate('/#/admin')} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  <span>Back to Admin</span>
-                </button>
-              ) : (
-                <button onClick={() => navigate('/#/admin')} className="hover:text-emerald-200 transition-colors">
+              {isAdminLoggedIn && (
+                <button onClick={() => window.location.href = '/#/admin'} className="hover:text-emerald-200 transition-colors">
                   Admin Portal
                 </button>
               )}
-              <a href={`https://wa.me/9415058167`} target="_blank" rel="noopener noreferrer" className="bg-white text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-50 transition-colors">
+              <button onClick={() => window.location.href = 'https://wa.me/9415058167'} className="bg-white text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-50 transition-colors">
                 Contact Us
-              </a>
+              </button>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -208,18 +237,14 @@ Financial Advice & Loan Information
               <button onClick={() => { handleContact('financial'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                 Financial Advice
               </button>
-              {isAdminLoggedIn ? (
-                <button onClick={() => { navigate('/#/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 bg-blue-600 text-white rounded font-semibold">
-                  ← Back to Admin Portal
-                </button>
-              ) : (
-                <button onClick={() => { navigate('/#/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
+              {isAdminLoggedIn && (
+                <button onClick={() => { window.location.href = '/#/admin'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                   Admin Portal
                 </button>
               )}
-              <a href={`https://wa.me/9415058167`} target="_blank" rel="noopener noreferrer" className="block w-full text-left py-2 px-4 bg-white text-emerald-600 rounded font-semibold">
+              <button onClick={() => { window.location.href = 'https://wa.me/9415058167'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 bg-white text-emerald-600 rounded font-semibold">
                 Contact Us
-              </a>
+              </button>
             </div>
           )}
         </div>
@@ -254,50 +279,50 @@ Financial Advice & Loan Information
         </div>
       )}
 
-      {/* Deal Popup Modal */}
+      {/* Dream Home Popup - Smaller Size */}
       {showDealPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-bounce-in">
-            <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white p-6 rounded-t-2xl relative">
-              <button onClick={() => setShowDealPopup(false)} className="absolute top-4 right-4 text-white hover:text-gray-200">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl animate-dream-home">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-xl relative">
+              <button onClick={() => setShowDealPopup(false)} className="absolute top-2 right-2 text-white hover:text-gray-200">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-2">
-                🔥 DON'T MISS THE DEAL! 🔥
-              </h2>
-              <p className="text-center text-lg">Freshly Added Premium Properties</p>
+              <div className="text-center">
+                <div className="text-3xl mb-2">🏠</div>
+                <h2 className="text-xl font-bold">Your Dream Home Awaits!</h2>
+                <p className="text-sm opacity-90">Fresh properties available</p>
+              </div>
             </div>
             
-            <div className="p-6 space-y-4">
-              <div className="text-center mb-4">
-                <p className="text-2xl font-bold text-gray-800 mb-2">⏰ Limited Time Offer!</p>
-                <p className="text-gray-600">Check out our newest properties before they're gone</p>
+            <div className="p-4 space-y-3">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-gray-800">✨ New Arrivals</p>
+                <p className="text-sm text-gray-600">Check out our latest properties</p>
               </div>
 
-              {freshProperties.map((plot, index) => (
-                <div key={plot.id} className="border-2 border-orange-300 rounded-lg p-4 bg-gradient-to-r from-orange-50 to-yellow-50 hover:shadow-lg transition-shadow">
-                  <div className="flex justify-between items-start mb-2">
+              {freshProperties.slice(0, 2).map((plot) => (
+                <div key={plot.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-center mb-2">
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900">{plot.plotNumber}</h3>
-                      <p className="text-sm text-gray-600">{plot.location.gramSabha}</p>
+                      <h4 className="font-bold text-gray-900">{plot.plotNumber}</h4>
+                      <p className="text-xs text-gray-600">{plot.location.gramSabha}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(plot.status)}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(plot.status)}`}>
                       {plot.status}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                    <div><span className="text-gray-600">Area:</span> <span className="font-semibold">{plot.plotArea.value} {plot.plotArea.unit}</span></div>
-                    <div><span className="text-gray-600">Size:</span> <span className="font-semibold">{plot.size.length}×{plot.size.width} {plot.size.unit}</span></div>
+                  <div className="text-xs text-gray-600 mb-2">
+                    Area: {plot.plotArea.value} {plot.plotArea.unit}
                   </div>
-                  <button onClick={() => { setSelectedPlot(plot); setShowDealPopup(false); }} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 rounded-lg font-bold hover:from-orange-600 hover:to-red-600 transition-all">
+                  <button onClick={() => { setSelectedPlot(plot); setShowDealPopup(false); }} className="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors">
                     View Details →
                   </button>
                 </div>
               ))}
 
-              <button onClick={() => setShowDealPopup(false)} className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-bold hover:bg-gray-300 transition-colors mt-4">
+              <button onClick={() => setShowDealPopup(false)} className="w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors text-sm">
                 Browse All Properties
               </button>
             </div>
@@ -536,9 +561,11 @@ Financial Advice & Loan Information
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-gray-400 hover:text-white transition-colors">🏠 Properties</button></li>
-                <li><button onClick={() => navigate('/#/admin')} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                {isAdminLoggedIn && (
+                  <li><button onClick={() => window.location.href = '/#/admin'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                )}
                 <li><button onClick={() => handleContact('financial')} className="text-gray-400 hover:text-white transition-colors">💼 Financial Advice</button></li>
-                <li><a href={`https://wa.me/9415058167`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</a></li>
+                <li><button onClick={() => window.location.href = 'https://wa.me/9415058167'} className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</button></li>
               </ul>
             </div>
 
@@ -558,14 +585,37 @@ Financial Advice & Loan Information
       </footer>
 
       <style>{`
-        @keyframes bounce-in {
-          0% { transform: scale(0.3); opacity: 0; }
-          50% { transform: scale(1.05); }
-          70% { transform: scale(0.9); }
-          100% { transform: scale(1); opacity: 1; }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
-        .animate-bounce-in {
-          animation: bounce-in 0.5s ease-out;
+        @keyframes slide-up {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slide-down {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes dream-home {
+          0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+          50% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.6s ease-out;
+        }
+        .animate-slide-down {
+          animation: slide-down 0.7s ease-out;
+        }
+        .animate-dream-home {
+          animation: dream-home 0.8s ease-out;
+        }
+        .animate-home-formation {
+          animation: fade-in 0.5s ease-out;
         }
       `}</style>
     </div>
