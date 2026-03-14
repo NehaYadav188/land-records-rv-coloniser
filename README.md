@@ -37,10 +37,10 @@ A modern, mobile-responsive web application for managing land records and proper
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/loyalty-business.git
+git clone https://github.com/YOUR_USERNAME/land-records-app.git
 
 # Navigate to project directory
-cd loyalty-business/land-records-app
+cd land-records-app
 
 # Install dependencies
 npm install

@@ -12,9 +12,9 @@
 1. Go to [GitHub](https://github.com)
 2. Click the "+" icon in the top right corner
 3. Select "New repository"
-4. Repository name: `loyalty-business` (or your preferred name)
+4. Repository name: `land-records-app`
 5. Description: "RV Coloniser - Land Records Management System"
-6. Choose "Public" or "Private"
+6. Choose "Public" (recommended for GitHub Pages)
 7. **DO NOT** initialize with README, .gitignore, or license (we already have these)
 8. Click "Create repository"
 
@@ -25,19 +25,21 @@
 cd /Users/nyadav/Documents/loyalty-business/land-records-app
 
 # Add remote repository (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/loyalty-business.git
+git remote add origin https://github.com/YOUR_USERNAME/land-records-app.git
 
 # Or if you already have a remote, update it:
-git remote set-url origin https://github.com/YOUR_USERNAME/loyalty-business.git
+git remote set-url origin https://github.com/YOUR_USERNAME/land-records-app.git
 ```
 
 ### Step 3: Update Homepage in package.json
 
-The `package.json` already has the homepage field. Update it with your GitHub username:
+The `package.json` already has the homepage field configured:
 
 ```json
-"homepage": "https://YOUR_USERNAME.github.io/loyalty-business"
+"homepage": "https://YOUR_USERNAME.github.io/land-records-app"
 ```
+
+Replace `YOUR_USERNAME` with your actual GitHub username (currently set to `nyadav`).
 
 ### Step 4: Commit and Push Your Code
 
@@ -78,7 +80,12 @@ This command will:
 
 Your app will be available at:
 ```
-https://YOUR_USERNAME.github.io/loyalty-business
+https://YOUR_USERNAME.github.io/land-records-app
+```
+
+**Example with username 'nyadav':**
+```
+https://nyadav.github.io/land-records-app
 ```
 
 It may take a few minutes for the deployment to complete.
