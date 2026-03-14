@@ -22,7 +22,7 @@
 
 ```bash
 # Navigate to your project directory
-cd /Users/nyadav/Documents/loyalty-business/land-records-app
+cd /path/to/land-records-app
 
 # Add remote repository (replace YOUR_USERNAME with your GitHub username)
 git remote add origin https://github.com/YOUR_USERNAME/land-records-app.git
