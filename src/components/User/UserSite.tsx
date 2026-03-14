@@ -276,7 +276,7 @@ Financial Advice & Loan Information
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="animate-pulse">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
-                🏡 Make Your Dream Home Come True! 🏡
+                � Build Your Elite Property Today! �
               </h2>
               <p className="text-lg sm:text-xl md:text-2xl mb-4">
                 Invest in Your Future Today - Premium Land Plots Available
@@ -684,7 +684,7 @@ Financial Advice & Loan Information
                 <Logo size="sm" showText={false} />
                 <h3 className="text-xl font-bold">RV Coloniser</h3>
               </div>
-              <p className="text-gray-400 text-sm">Your trusted partner for land investments. Make your dream home come true!</p>
+              <p className="text-gray-400 text-sm">Your trusted partner for premium land investments and elite properties.</p>
             </div>
 
             <div>
