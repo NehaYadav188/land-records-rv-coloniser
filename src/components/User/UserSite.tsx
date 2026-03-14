@@ -294,16 +294,16 @@ Financial Advice & Loan Information
         </div>
       )}
 
-      {/* Premium Real Estate Popup */}
+      {/* Elite Real Estate Popup */}
       {showDealPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-premium-popup">
-            {/* Premium Header with Building Animation */}
-            <div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8 text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-elite-popup">
+            {/* Elite Header with Building Animation */}
+            <div className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 p-8 text-white">
               <div className="absolute top-6 right-6">
                 <button 
                   onClick={() => setShowDealPopup(false)} 
-                  className="w-10 h-10 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-300"
+                  className="w-10 h-10 bg-white bg-opacity-10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-opacity-20 transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -314,35 +314,35 @@ Financial Advice & Loan Information
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center animate-building-glow">
+                    <div className="w-16 h-16 bg-gradient-to-br from-amber-600 to-slate-700 rounded-2xl flex items-center justify-center animate-building-glow">
                       <div className="text-2xl">🏢</div>
                     </div>
                     <div>
-                      <h1 className="text-3xl font-bold mb-1">RV Coloniser Premium</h1>
-                      <p className="text-blue-200 text-sm">Exclusive Properties • Prime Locations • Luxury Living</p>
+                      <h1 className="text-3xl font-bold mb-1">RV Coloniser Elite</h1>
+                      <p className="text-slate-300 text-sm">Premium Properties • Exclusive Locations • Elite Living</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-6 text-sm">
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span>New Listings Available</span>
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                      <span>New Listings</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                      <span>Premium Locations</span>
+                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+                      <span>Premium</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                      <span>Ready to Move</span>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <span>Ready</span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Premium Building Animation */}
+                {/* Elite Building Animation */}
                 <div className="relative w-32 h-32 animate-building-float">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-2xl opacity-20 animate-building-pulse"></div>
-                  <div className="absolute inset-2 bg-gradient-to-br from-blue-500 to-purple-700 rounded-xl opacity-40 animate-building-pulse" style={{animationDelay: '0.5s'}}></div>
-                  <div className="absolute inset-4 bg-gradient-to-br from-blue-600 to-purple-800 rounded-lg opacity-60 animate-building-pulse" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-800 rounded-2xl opacity-20 animate-building-pulse"></div>
+                  <div className="absolute inset-2 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl opacity-40 animate-building-pulse" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute inset-4 bg-gradient-to-br from-slate-800 to-black rounded-lg opacity-60 animate-building-pulse" style={{animationDelay: '1s'}}></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-4xl animate-building-rise">🏗️</div>
                   </div>
@@ -362,8 +362,8 @@ Financial Advice & Loan Information
                   <div key={plot.id} className="group">
                     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
                       {/* Property Image Placeholder */}
-                      <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-600 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                      <div className="h-48 bg-gradient-to-br from-slate-600 to-slate-800 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-white text-center">
                             <div className="text-3xl font-bold mb-2">{plot.plotNumber}</div>
@@ -390,15 +390,15 @@ Financial Advice & Loan Information
                             <p className="text-sm text-gray-500">{plot.location.gramSabha}</p>
                           </div>
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-blue-600">₹{(plot.sellingDetails.value / 100000).toFixed(1)}L</div>
+                            <div className="text-2xl font-bold text-slate-700">₹{(plot.sellingDetails.value / 100000).toFixed(1)}L</div>
                             <div className="text-xs text-gray-500">Negotiable</div>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                           <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <span className="text-blue-600">📐</span>
+                            <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                              <span className="text-slate-600">📐</span>
                             </div>
                             <div>
                               <div className="text-xs text-gray-500">Area</div>
@@ -406,8 +406,8 @@ Financial Advice & Loan Information
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                              <span className="text-green-600">🏠</span>
+                            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                              <span className="text-amber-600">🏠</span>
                             </div>
                             <div>
                               <div className="text-xs text-gray-500">Type</div>
@@ -418,7 +418,7 @@ Financial Advice & Loan Information
                         
                         <button 
                           onClick={() => { setSelectedPlot(plot); setShowDealPopup(false); }} 
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02]"
+                          className="w-full bg-gradient-to-r from-slate-700 to-slate-900 text-white py-3 rounded-xl font-semibold hover:from-slate-800 hover:to-black transition-all duration-300 transform hover:scale-[1.02]"
                         >
                           View Details →
                         </button>
@@ -430,12 +430,12 @@ Financial Advice & Loan Information
 
               <div className="flex items-center justify-between">
                 <div className="text-left">
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Why Choose RV Coloniser?</h3>
-                  <p className="text-sm text-gray-600">Trusted by thousands of happy homeowners</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Why Choose RV Coloniser Elite?</h3>
+                  <p className="text-sm text-gray-600">Trusted by elite homeowners and investors</p>
                 </div>
                 <button 
                   onClick={() => setShowDealPopup(false)} 
-                  className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-xl font-semibold hover:from-gray-800 hover:to-black transition-all duration-300"
+                  className="px-8 py-3 bg-gradient-to-r from-slate-700 to-slate-900 text-white rounded-xl font-semibold hover:from-slate-800 hover:to-black transition-all duration-300"
                 >
                   Explore All Properties
                 </button>
@@ -910,6 +910,16 @@ Financial Advice & Loan Information
         
         .animate-premium-popup {
           animation: premium-popup 0.5s ease-out;
+        }
+        
+        /* Elite Popup Animation */
+        @keyframes elite-popup {
+          0% { transform: scale(0.85) translateY(30px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        
+        .animate-elite-popup {
+          animation: elite-popup 0.6s ease-out;
         }
         .animate-building-glow {
           animation: building-glow 2s ease-in-out infinite;
