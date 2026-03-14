@@ -61,7 +61,7 @@ const SiteVisitModal: React.FC<SiteVisitModalProps> = ({ plot, onClose }) => {
 
 *🌐 Quick Links:*
 • User Site: ${window.location.origin}
-• Admin Portal: ${window.location.origin}/admin
+• Admin Portal: ${window.location.origin}/#/admin
 
 ---
 *This is a site visit request from RV Coloniser website. Please contact the customer to schedule the visit.*`;

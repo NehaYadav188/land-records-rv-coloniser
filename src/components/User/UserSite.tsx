@@ -112,7 +112,14 @@ Financial Advice & Loan Information
 ---
 *I would like to discuss financial options and loan facilities for property purchase.*`;
       
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      return;
+    }
+
+    if (type === 'call') {
+      const callUrl = `tel:${callNumber}`;
+      window.open(callUrl, '_self');
       return;
     }
 
@@ -134,11 +141,10 @@ Financial Advice & Loan Information
 
 *🌐 Links:*
 • User Site: ${window.location.origin}
-• Admin Portal: ${window.location.origin}/admin`;
+• Admin Portal: ${window.location.origin}/#/admin`;
       
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    } else {
-      window.open(`tel:${callNumber}`);
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
     }
   };
 
@@ -165,14 +171,14 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn ? (
-                <button onClick={() => navigate('/admin')} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                <button onClick={() => navigate('/#/admin')} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   <span>Back to Admin</span>
                 </button>
               ) : (
-                <button onClick={() => navigate('/admin')} className="hover:text-emerald-200 transition-colors">
+                <button onClick={() => navigate('/#/admin')} className="hover:text-emerald-200 transition-colors">
                   Admin Portal
                 </button>
               )}
@@ -203,11 +209,11 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAdminLoggedIn ? (
-                <button onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 bg-blue-600 text-white rounded font-semibold">
+                <button onClick={() => { navigate('/#/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 bg-blue-600 text-white rounded font-semibold">
                   ← Back to Admin Portal
                 </button>
               ) : (
-                <button onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
+                <button onClick={() => { navigate('/#/admin'); setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                   Admin Portal
                 </button>
               )}
@@ -530,7 +536,7 @@ Financial Advice & Loan Information
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-gray-400 hover:text-white transition-colors">🏠 Properties</button></li>
-                <li><button onClick={() => navigate('/admin')} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                <li><button onClick={() => navigate('/#/admin')} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
                 <li><button onClick={() => handleContact('financial')} className="text-gray-400 hover:text-white transition-colors">💼 Financial Advice</button></li>
                 <li><a href={`https://wa.me/9415058167`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</a></li>
               </ul>
