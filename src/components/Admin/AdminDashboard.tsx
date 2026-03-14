@@ -191,7 +191,7 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               {/* Prominent User Site Button */}
               <button
-                onClick={() => window.location.href = window.location.origin}
+                onClick={() => window.location.href = 'https://nehayadav188.github.io/land-records-rv-coloniser/'}
                 className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-lg font-bold hover:from-emerald-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -663,38 +663,60 @@ const AdminDashboard: React.FC = () => {
 
       {/* Add/Edit Plot Form Modal */}
       {showForm && selectedLand && (
-        <LandForm
-          onSubmit={(plot: PlotDetails) => {
-            if (selectedPlot) {
-              // Edit existing plot
-              setLandRecords(prev => prev.map(land => {
-                if (land.id === selectedLand.id) {
-                  return {
-                    ...land,
-                    plots: land.plots?.map(p => p.id === plot.id ? plot : p) || []
-                  };
-                }
-                return land;
-              }));
-            } else {
-              // Add new plot
-              setLandRecords(prev => prev.map(land => {
-                if (land.id === selectedLand.id) {
-                  return {
-                    ...land,
-                    plots: [...(land.plots || []), plot]
-                  };
-                }
-                return land;
-              }));
-            }
-            handleCloseForm();
-          }}
-          onCancel={handleCloseForm}
-          remainingArea={calculateRemainingArea(selectedLand)}
-          initialData={selectedPlot || undefined}
-          isEdit={!!selectedPlot}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {selectedPlot ? 'Edit Plot' : 'Add New Plot'} - {selectedLand.landNumber}
+                </h3>
+                <button
+                  onClick={handleCloseForm}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <LandForm
+                onSubmit={(plot: PlotDetails) => {
+                  if (selectedPlot) {
+                    // Edit existing plot
+                    setLandRecords(prev => prev.map(land => {
+                      if (land.id === selectedLand.id) {
+                        return {
+                          ...land,
+                          plots: land.plots?.map(p => p.id === plot.id ? plot : p) || []
+                        };
+                      }
+                      return land;
+                    }));
+                  } else {
+                    // Add new plot
+                    setLandRecords(prev => prev.map(land => {
+                      if (land.id === selectedLand.id) {
+                        return {
+                          ...land,
+                          plots: [...(land.plots || []), plot]
+                        };
+                      }
+                      return land;
+                    }));
+                  }
+                  handleCloseForm();
+                }}
+                onCancel={handleCloseForm}
+                remainingArea={calculateRemainingArea(selectedLand)}
+                initialData={selectedPlot || undefined}
+                isEdit={!!selectedPlot}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* New Land Form Modal */}

@@ -46,6 +46,13 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea, 
     location: { gramSabha: '', fullAddress: '' }
   });
 
+  // Update form data when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData && isEdit) {
+      setFormData(initialData);
+    }
+  }, [initialData, isEdit]);
+
   // Auto-calculate balance when selling details change
   useEffect(() => {
     const totalValue = formData.sellingDetails.value || 0;
