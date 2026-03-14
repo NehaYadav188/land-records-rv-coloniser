@@ -23,10 +23,20 @@ export const convertArea = (
   fromUnit: AreaUnit,
   toUnit: AreaUnit
 ): number => {
+  if (isNaN(value) || !isFinite(value)) {
+    return 0;
+  }
+  if (!conversionRates[fromUnit] || !conversionRates[fromUnit][toUnit]) {
+    console.error(`Invalid conversion: ${fromUnit} to ${toUnit}`);
+    return 0;
+  }
   return value * conversionRates[fromUnit][toUnit];
 };
 
 export const formatArea = (value: number, unit: AreaUnit): string => {
+  if (isNaN(value) || !isFinite(value)) {
+    return `0.00 ${unit}`;
+  }
   return `${value.toFixed(2)} ${unit}`;
 };
 

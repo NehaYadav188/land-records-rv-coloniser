@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonInfo, BankDetails, AreaUnit, PlotDetails } from '../../types';
 import { formatArea, getAllEquivalentAreas } from '../../utils/areaConversion';
 
@@ -6,16 +6,21 @@ interface LandFormProps {
   onSubmit: (plotData: PlotDetails) => void;
   onCancel: () => void;
   remainingArea?: number;
+  initialData?: PlotDetails;
+  isEdit?: boolean;
 }
 
-const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }) => {
-  const [formData, setFormData] = useState({
+const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea, initialData, isEdit = false }) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [formData, setFormData] = useState(initialData || {
     plotNumber: '',
     privatePlotNumber: '',
     landArea: { value: 0, unit: 'sqft' as AreaUnit },
     plotArea: { value: 0, unit: 'sqft' as AreaUnit },
     size: { length: 0, width: 0, unit: 'sqft' as AreaUnit },
     status: 'open' as 'sold' | 'booked' | 'open',
+    transactionType: 'sold' as 'sold' | 'purchased' | 'both',
     possession: false,
     miscellaneous: { type: 'normal' as 'disputed' | 'normal' | 'optional', description: '' },
     dateOfSale: '',
@@ -41,6 +46,40 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
     location: { gramSabha: '', fullAddress: '' }
   });
 
+  // Auto-calculate balance when selling details change
+  useEffect(() => {
+    const totalValue = formData.sellingDetails.value || 0;
+    const credited = formData.sellingDetails.creditedAmount || 0;
+    const calculatedBalance = totalValue - credited;
+    
+    if (calculatedBalance !== formData.sellingDetails.balance) {
+      setFormData(prev => ({
+        ...prev,
+        sellingDetails: {
+          ...prev.sellingDetails,
+          balance: calculatedBalance
+        }
+      }));
+    }
+  }, [formData.sellingDetails.value, formData.sellingDetails.creditedAmount]);
+
+  // Auto-calculate balance for purchase details
+  useEffect(() => {
+    const totalValue = formData.purchaseDetails.value || 0;
+    const debited = formData.purchaseDetails.debitedAmount || 0;
+    const calculatedBalance = totalValue - debited;
+    
+    if (calculatedBalance !== formData.purchaseDetails.balance) {
+      setFormData(prev => ({
+        ...prev,
+        purchaseDetails: {
+          ...prev.purchaseDetails,
+          balance: calculatedBalance
+        }
+      }));
+    }
+  }, [formData.purchaseDetails.value, formData.purchaseDetails.debitedAmount]);
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -58,15 +97,69 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
     }));
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Name validations
+    if (!formData.plotNumber.trim()) {
+      newErrors.plotNumber = 'Plot number is required';
+    }
+    if (formData.sellerInfo.name && !/^[a-zA-Z\s]+$/.test(formData.sellerInfo.name)) {
+      newErrors.sellerName = 'Seller name should contain only letters';
+    }
+    if (formData.purchaserInfo.name && !/^[a-zA-Z\s]+$/.test(formData.purchaserInfo.name)) {
+      newErrors.purchaserName = 'Purchaser name should contain only letters';
+    }
+
+    // Phone number validations
+    if (formData.sellerInfo.mobileNumber && !/^[0-9]{10}$/.test(formData.sellerInfo.mobileNumber)) {
+      newErrors.sellerPhone = 'Seller phone must be 10 digits';
+    }
+    if (formData.purchaserInfo.mobileNumber && !/^[0-9]{10}$/.test(formData.purchaserInfo.mobileNumber)) {
+      newErrors.purchaserPhone = 'Purchaser phone must be 10 digits';
+    }
+
+    // Area validations
+    if (formData.landArea.value <= 0) {
+      newErrors.landArea = 'Land area must be greater than 0';
+    }
+    if (formData.plotArea.value <= 0) {
+      newErrors.plotArea = 'Plot area must be greater than 0';
+    }
+    if (formData.size.length <= 0 || formData.size.width <= 0) {
+      newErrors.size = 'Length and width must be greater than 0';
+    }
+
+    // Currency validations
+    if (formData.sellingDetails.value < 0) {
+      newErrors.sellingValue = 'Selling value cannot be negative';
+    }
+    if ((formData.sellingDetails.creditedAmount || 0) < 0) {
+      newErrors.creditedAmount = 'Credited amount cannot be negative';
+    }
+    if ((formData.sellingDetails.creditedAmount || 0) > formData.sellingDetails.value) {
+      newErrors.creditedAmount = 'Credited amount cannot exceed total value';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      alert('Please fix the validation errors before submitting');
+      return;
+    }
+
     onSubmit({
       ...formData,
-      id: `plot-${Date.now()}`
+      id: isEdit && 'id' in formData ? formData.id : `plot-${Date.now()}`
     });
   };
 
-  const AreaInput = ({ label, value, onChange }: { label: string; value: any; onChange: (val: any) => void }) => {
+  const AreaInput = ({ label, value, onChange, error }: { label: string; value: any; onChange: (val: any) => void; error?: string }) => {
     const equivalents = getAllEquivalentAreas(value.value, value.unit);
     
     return (
@@ -74,10 +167,17 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <div className="flex gap-2 items-center">
           <input
-            type="number"
-            value={value.value}
-            onChange={(e) => onChange({ ...value, value: parseFloat(e.target.value) || 0 })}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="text"
+            inputMode="decimal"
+            value={value.value || ''}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9.]/g, '');
+              onChange({ ...value, value: parseFloat(val) || 0 });
+            }}
+            placeholder="Enter area"
+            className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              error ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
           <select
             value={value.unit}
@@ -89,6 +189,7 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
             <option value="yard">yard</option>
           </select>
         </div>
+        {error && <p className="text-red-500 text-xs">{error}</p>}
         <div className="text-xs text-gray-500">
           Equivalents: {formatArea(equivalents.sqft, 'sqft')} | {formatArea(equivalents.sqm, 'sqm')} | {formatArea(equivalents.yard, 'yard')}
         </div>
@@ -96,57 +197,57 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
     );
   };
 
-  const CurrencyInput = ({ label, value, onChange, placeholder }: { 
+  const CurrencyInput = ({ label, value, onChange, placeholder, error, readOnly = false }: { 
     label: string; 
     value: number; 
     onChange: (val: number) => void; 
     placeholder?: string;
+    error?: string;
+    readOnly?: boolean;
   }) => {
-    const [displayValue, setDisplayValue] = useState(`Rs ${value.toLocaleString('en-IN')}`);
-    
+    const [displayValue, setDisplayValue] = useState(value ? value.toString() : '');
+
+    useEffect(() => {
+      setDisplayValue(value ? value.toString() : '');
+    }, [value]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value.replace(/[^\d]/g, '');
-      const numValue = parseFloat(newValue) || 0;
-      setDisplayValue(`Rs ${numValue.toLocaleString('en-IN')}`);
-      onChange(numValue);
+      if (readOnly) return;
+      
+      const inputValue = e.target.value;
+      const cleanValue = inputValue.replace(/[^0-9.]/g, '');
+      
+      setDisplayValue(cleanValue);
+      onChange(parseFloat(cleanValue) || 0);
     };
-    
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // Allow tab navigation, arrow keys, backspace, delete
-      if (e.key === 'Tab' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
-          e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Home' || e.key === 'End') {
-        return;
-      }
-      // Only allow numbers
-      if (!/^\d$/.test(e.key) && e.key !== '.') {
-        e.preventDefault();
-      }
-    };
-    
+
     return (
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">{label}</label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">
-            Rs
-          </span>
-          <input
-            type="text"
-            value={displayValue}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder || "Rs 0"}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <p className="text-xs text-gray-500">Type numbers directly or use Tab to navigate</p>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={displayValue}
+          onChange={handleChange}
+          placeholder={placeholder || 'Enter amount'}
+          readOnly={readOnly}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            error ? 'border-red-500' : 'border-gray-300'
+          } ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        />
+        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {value > 0 && (
+          <p className="text-xs text-gray-500">Rs {value.toLocaleString('en-IN')}</p>
+        )}
       </div>
     );
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Add New Plot Details</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        {isEdit ? 'Edit Plot Details' : 'Add New Plot Details'}
+      </h2>
       
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,6 +306,7 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
             handleNestedChange('landArea', 'value', val.value);
             handleNestedChange('landArea', 'unit', val.unit);
           }}
+          error={errors.landArea}
         />
         <AreaInput
           label="Plot Area"
@@ -213,24 +315,37 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
             handleNestedChange('plotArea', 'value', val.value);
             handleNestedChange('plotArea', 'unit', val.unit);
           }}
+          error={errors.plotArea}
         />
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Size (Length x Width)</label>
           <div className="flex gap-2 items-center">
             <input
-              type="number"
-              value={formData.size.length}
-              onChange={(e) => handleNestedChange('size', 'length', parseFloat(e.target.value) || 0)}
+              type="text"
+              inputMode="decimal"
+              value={formData.size.length || ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9.]/g, '');
+                handleNestedChange('size', 'length', parseFloat(val) || 0);
+              }}
               placeholder="Length"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.size ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
             <span className="text-gray-500">×</span>
             <input
-              type="number"
-              value={formData.size.width}
-              onChange={(e) => handleNestedChange('size', 'width', parseFloat(e.target.value) || 0)}
+              type="text"
+              inputMode="decimal"
+              value={formData.size.width || ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9.]/g, '');
+                handleNestedChange('size', 'width', parseFloat(val) || 0);
+              }}
               placeholder="Width"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.size ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
             <select
               value={formData.size.unit}
@@ -269,8 +384,8 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
         </div>
       </div>
 
-      {/* Status and Possession */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Status, Transaction Type and Possession */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Status</label>
           <select
@@ -281,6 +396,18 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
             <option value="open">Open</option>
             <option value="booked">Booked</option>
             <option value="sold">Sold</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Transaction Type</label>
+          <select
+            value={formData.transactionType || 'sold'}
+            onChange={(e) => handleInputChange('transactionType', e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="sold">Sold</option>
+            <option value="purchased">Purchased</option>
+            <option value="both">Both (Sold & Purchased)</option>
           </select>
         </div>
         <div className="flex items-center">
@@ -335,19 +462,27 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
               type="text"
               value={formData.sellerInfo.name}
               onChange={(e) => handleNestedChange('sellerInfo', 'name', e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.sellerName ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
+            {errors.sellerName && <p className="text-red-500 text-xs mt-1">{errors.sellerName}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
             <input
               type="tel"
               value={formData.sellerInfo.mobileNumber}
-              onChange={(e) => handleNestedChange('sellerInfo', 'mobileNumber', e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => handleNestedChange('sellerInfo', 'mobileNumber', e.target.value.replace(/[^0-9]/g, ''))}
+              maxLength={10}
+              placeholder="10 digit number"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.sellerPhone ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
+            {errors.sellerPhone && <p className="text-red-500 text-xs mt-1">{errors.sellerPhone}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Address</label>
@@ -372,19 +507,27 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
               type="text"
               value={formData.purchaserInfo.name}
               onChange={(e) => handleNestedChange('purchaserInfo', 'name', e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.purchaserName ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
+            {errors.purchaserName && <p className="text-red-500 text-xs mt-1">{errors.purchaserName}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
             <input
               type="tel"
               value={formData.purchaserInfo.mobileNumber}
-              onChange={(e) => handleNestedChange('purchaserInfo', 'mobileNumber', e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => handleNestedChange('purchaserInfo', 'mobileNumber', e.target.value.replace(/[^0-9]/g, ''))}
+              maxLength={10}
+              placeholder="10 digit number"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.purchaserPhone ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
+            {errors.purchaserPhone && <p className="text-red-500 text-xs mt-1">{errors.purchaserPhone}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Address</label>
@@ -431,22 +574,25 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea }
             />
           </div>
           <CurrencyInput
-            label="Value"
+            label="Total Value"
             value={formData.sellingDetails.value}
             onChange={(val) => handleNestedChange('sellingDetails', 'value', val)}
-            placeholder="Rs 0"
-          />
-          <CurrencyInput
-            label="Balance"
-            value={formData.sellingDetails.balance}
-            onChange={(val) => handleNestedChange('sellingDetails', 'balance', val)}
-            placeholder="Rs 0"
+            placeholder="Enter total amount"
+            error={errors.sellingValue}
           />
           <CurrencyInput
             label="Credited Amount"
             value={formData.sellingDetails.creditedAmount || 0}
             onChange={(val) => handleNestedChange('sellingDetails', 'creditedAmount', val)}
-            placeholder="Rs 0"
+            placeholder="Enter credited amount"
+            error={errors.creditedAmount}
+          />
+          <CurrencyInput
+            label="Balance (Auto-calculated)"
+            value={formData.sellingDetails.balance}
+            onChange={(val) => handleNestedChange('sellingDetails', 'balance', val)}
+            placeholder="Auto-calculated"
+            readOnly={true}
           />
         </div>
       </div>

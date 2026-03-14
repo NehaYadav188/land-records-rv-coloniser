@@ -4,27 +4,28 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminLogin from './components/Auth/AdminLogin';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserSite from './components/User/UserSite';
-
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
-};
-
-const AdminLoginWrapper: React.FC = () => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  
-  const handleLogin = (username: string, password: string) => {
-    const success = login(username, password);
-    if (success) {
-      navigate('/admin');
-    }
-  };
-  
-  return <AdminLogin onLogin={handleLogin} />;
-};
+import ErrorBoundary from './components/ErrorBoundary';
 
 const AppContent: React.FC = () => {
+  const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { isAuthenticated } = useAuth();
+    return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
+  };
+
+  const AdminLoginWrapper: React.FC = () => {
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    
+    const handleLogin = (username: string, password: string) => {
+      const success = login(username, password);
+      if (success) {
+        navigate('/admin');
+      }
+    };
+    
+    return <AdminLogin onLogin={handleLogin} />;
+  };
+
   return (
     <Router>
       <Routes>
@@ -49,9 +50,11 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

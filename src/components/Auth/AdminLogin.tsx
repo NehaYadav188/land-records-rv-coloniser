@@ -95,9 +95,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Default credentials:</p>
-          <p className="font-semibold">ryadav / yadav@123</p>
+        <div className="mt-6 text-center">
+          <a 
+            href="/"
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            ← Back to User Site
+          </a>
         </div>
       </div>
     </div>

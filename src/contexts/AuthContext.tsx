@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 
 interface AdminUser {
   username: string;
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [remainingTime, setRemainingTime] = useState<number>(0);
 
-  const login = (username: string, password: string): boolean => {
+  const login = useCallback((username: string, password: string): boolean => {
     // Check default admin credentials
     if (username === 'ryadav' && password === 'yadav@123') {
       const expiresAt = new Date();
@@ -71,34 +71,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     
     return false;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('adminUser');
-  };
+  }, []);
 
-  const extendSession = () => {
+  const extendSession = useCallback(() => {
     if (user) {
       const newExpiresAt = new Date();
       newExpiresAt.setHours(newExpiresAt.getHours() + 1); // Add 1 hour
       
       const updatedUser: AdminUser = {
         ...user,
-        expiresAt: newExpiresAt
+        expiresAt: newExpiresAt,
+        loginTime: user.loginTime // Keep original login time
       };
       
       setUser(updatedUser);
       localStorage.setItem('adminUser', JSON.stringify(updatedUser));
     }
-  };
+  }, [user]);
 
   // Check if session is still valid
-  const isSessionValid = (user: AdminUser | null): boolean => {
+  const isSessionValid = useCallback((user: AdminUser | null): boolean => {
     if (!user) return false;
     const now = new Date();
-    return new Date(user.expiresAt) > now;
-  };
+    const expiresAt = new Date(user.expiresAt);
+    // Check if expiresAt is a valid date
+    if (isNaN(expiresAt.getTime())) {
+      return false;
+    }
+    return expiresAt > now;
+  }, []);
 
   const isAuthenticated = !!user && isSessionValid(user);
 
@@ -107,18 +113,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (user && !isSessionValid(user)) {
       logout();
     }
-  }, [user]);
+  }, [user, logout, isSessionValid]);
 
   // Update remaining time every minute
   React.useEffect(() => {
     const updateRemainingTime = () => {
-      if (user && isSessionValid(user)) {
-        const now = new Date();
-        const expiresAt = new Date(user.expiresAt);
-        const remainingMs = expiresAt.getTime() - now.getTime();
-        const remainingMinutes = Math.max(0, Math.floor(remainingMs / (1000 * 60)));
-        setRemainingTime(remainingMinutes);
-      } else {
+      try {
+        if (user && isSessionValid(user)) {
+          const now = new Date();
+          const expiresAt = new Date(user.expiresAt);
+          if (isNaN(expiresAt.getTime())) {
+            setRemainingTime(0);
+            return;
+          }
+          const remainingMs = expiresAt.getTime() - now.getTime();
+          const remainingMinutes = Math.max(0, Math.floor(remainingMs / (1000 * 60)));
+          setRemainingTime(remainingMinutes);
+        } else {
+          setRemainingTime(0);
+        }
+      } catch (error) {
+        console.error('Error updating remaining time:', error);
         setRemainingTime(0);
       }
     };
@@ -127,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const interval = setInterval(updateRemainingTime, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, isSessionValid]);
 
   // Check for existing session on mount
   React.useEffect(() => {
@@ -135,6 +150,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
+        // Convert date strings back to Date objects
+        let isValidUser = true;
+        
+        if (parsedUser.loginTime) {
+          const loginTime = new Date(parsedUser.loginTime);
+          if (isNaN(loginTime.getTime())) {
+            console.error('Invalid loginTime date format');
+            isValidUser = false;
+          } else {
+            parsedUser.loginTime = loginTime;
+          }
+        }
+        
+        if (parsedUser.expiresAt) {
+          const expiresAt = new Date(parsedUser.expiresAt);
+          if (isNaN(expiresAt.getTime())) {
+            console.error('Invalid expiresAt date format');
+            isValidUser = false;
+          } else {
+            parsedUser.expiresAt = expiresAt;
+          }
+        }
+        
+        if (!isValidUser) {
+          localStorage.removeItem('adminUser');
+          return;
+        }
         // Check if saved session is still valid
         if (isSessionValid(parsedUser)) {
           setUser(parsedUser);
@@ -146,7 +188,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('adminUser');
       }
     }
-  }, []);
+  }, [isSessionValid]);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, extendSession, isAuthenticated, remainingTime }}>

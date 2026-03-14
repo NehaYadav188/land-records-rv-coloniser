@@ -3,7 +3,7 @@ import { PlotDetails } from '../../types';
 import Logo from '../Logo';
 
 interface SiteVisitModalProps {
-  plot: PlotDetails;
+  plot: PlotDetails & { landNumber: string };
   onClose: () => void;
 }
 
@@ -18,8 +18,63 @@ const SiteVisitModal: React.FC<SiteVisitModalProps> = ({ plot, onClose }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would normally send the data to your backend
+    
+    // Send WhatsApp notification with detailed information
+    const whatsappNumber = '9415058167';
+    const currentDate = new Date().toLocaleDateString('en-IN');
+    const currentTime = new Date().toLocaleTimeString('en-IN');
+    
+    const message = `*RV Coloniser - Site Visit Request* 🏘️
+
+*👤 User Information:*
+• Name: ${formData.name}
+• Email: ${formData.email}
+• Phone: ${formData.phone}
+• Date: ${currentDate}
+• Time: ${currentTime}
+• Requested Visit Date: ${formData.requestedDate}
+• Message: ${formData.message}
+
+*🏠 Property Details:*
+• Land Number: ${plot.landNumber}
+• Plot Number: ${plot.plotNumber}
+• Private Plot Number: ${plot.privatePlotNumber}
+• Status: ${plot.status.toUpperCase()}
+• Possession: ${plot.possession ? 'Available' : 'Not Available'}
+
+*📏 Area Information:*
+• Land Area: ${plot.landArea.value} ${plot.landArea.unit}
+• Plot Area: ${plot.plotArea.value} ${plot.plotArea.unit}
+• Dimensions: ${plot.size.length} x ${plot.size.width} ${plot.size.unit}
+
+*📍 Location:*
+• Gram Sabha: ${plot.location.gramSabha}
+• Full Address: ${plot.location.fullAddress}
+
+*💰 Pricing:*
+• Selling Price: Rs ${plot.sellingDetails.value.toLocaleString('en-IN')}
+• Balance: Rs ${plot.sellingDetails.balance.toLocaleString('en-IN')}
+
+*📞 Contact Information:*
+• WhatsApp: ${whatsappNumber}
+• Call: 9161811113
+
+*🌐 Quick Links:*
+• User Site: ${window.location.origin}
+• Admin Portal: ${window.location.origin}/admin
+
+---
+*This is a site visit request from RV Coloniser website. Please contact the customer to schedule the visit.*`;
+
+    // URL encode the message
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Open WhatsApp with pre-filled message
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+    
+    // Log for debugging
     console.log('Site visit request:', { plot: plot.plotNumber, ...formData });
+    
     alert('Site visit request submitted successfully! We will contact you soon.');
     onClose();
   };

@@ -18,6 +18,7 @@ const AdminDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'sold' | 'booked' | 'open'>('all');
   const [possessionFilter, setPossessionFilter] = useState<'all' | 'available' | 'not_available'>('all');
   const [balanceFilter, setBalanceFilter] = useState<'all' | 'pending' | 'cleared'>('all');
+  const [transactionFilter, setTransactionFilter] = useState<'all' | 'sold' | 'purchased' | 'both'>('all');
   const [newLandData, setNewLandData] = useState({ landNumber: '', totalArea: 0, unit: 'sqft' as const });
   const [showPlotModal, setShowPlotModal] = useState(false);
   const [showExtendSuccess, setShowExtendSuccess] = useState(false);
@@ -26,7 +27,14 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const savedData = localStorage.getItem('landRecords');
     if (savedData) {
-      setLandRecords(JSON.parse(savedData));
+      try {
+        const parsedData = JSON.parse(savedData);
+        setLandRecords(parsedData);
+      } catch (error) {
+        console.error('Error parsing land records from localStorage:', error);
+        setLandRecords(mockLandRecords);
+        localStorage.setItem('landRecords', JSON.stringify(mockLandRecords));
+      }
     } else {
       setLandRecords(mockLandRecords);
       localStorage.setItem('landRecords', JSON.stringify(mockLandRecords));
@@ -43,26 +51,54 @@ const AdminDashboard: React.FC = () => {
   const handleExtendSession = () => {
     extendSession();
     setShowExtendSuccess(true);
-    setTimeout(() => setShowExtendSuccess(false), 3000);
   };
+
+  // Clear success message after timeout
+  useEffect(() => {
+    if (showExtendSuccess) {
+      const timer = setTimeout(() => setShowExtendSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showExtendSuccess]);
 
   const handleAddPlot = (plotData: PlotDetails) => {
     if (!selectedLand) return;
 
-    const newPlot = {
-      ...plotData,
-      id: `plot-${Date.now()}`
-    };
+    // Check if we're editing an existing plot
+    const isEdit = selectedPlot && selectedLand.plots.some(p => p.id === plotData.id);
 
-    setLandRecords(prev => prev.map(land => 
-      land.id === selectedLand.id
-        ? { ...land, plots: [...land.plots, newPlot] }
-        : land
-    ));
+    if (isEdit) {
+      // Update existing plot
+      setLandRecords(prev => prev.map(land => 
+        land.id === selectedLand.id
+          ? { ...land, plots: land.plots.map(p => p.id === plotData.id ? plotData : p) }
+          : land
+      ));
 
-    // Update selected land to reflect changes
-    setSelectedLand(prev => prev ? { ...prev, plots: [...prev.plots, newPlot] } : null);
+      // Update selected land to reflect changes
+      setSelectedLand(prev => prev ? { 
+        ...prev, 
+        plots: prev.plots.map(p => p.id === plotData.id ? plotData : p) 
+      } : null);
+    } else {
+      // Add new plot
+      const newPlot = {
+        ...plotData,
+        id: `plot-${Date.now()}`
+      };
+
+      setLandRecords(prev => prev.map(land => 
+        land.id === selectedLand.id
+          ? { ...land, plots: [...land.plots, newPlot] }
+          : land
+      ));
+
+      // Update selected land to reflect changes
+      setSelectedLand(prev => prev ? { ...prev, plots: [...prev.plots, newPlot] } : null);
+    }
+
     setShowForm(false);
+    setSelectedPlot(null);
   };
 
   const handleAddNewLand = () => {
@@ -88,23 +124,42 @@ const AdminDashboard: React.FC = () => {
   };
 
   const calculateRemainingArea = (land: LandRecord) => {
-    const totalAreaInSqft = convertArea(land.totalArea.value, land.totalArea.unit, 'sqft');
-    const usedArea = land.plots
-      .filter(plot => plot.status === 'sold')
-      .reduce((sum, plot) => sum + convertArea(plot.plotArea.value, plot.plotArea.unit, 'sqft'), 0);
-    return totalAreaInSqft - usedArea;
+    try {
+      if (!land.totalArea?.value || !land.totalArea?.unit) {
+        return 0;
+      }
+      const totalAreaInSqft = convertArea(land.totalArea.value, land.totalArea.unit, 'sqft');
+      const usedArea = (land.plots || [])
+        .filter(plot => plot.status === 'sold')
+        .reduce((sum, plot) => {
+          try {
+            if (!plot.plotArea?.value || !plot.plotArea?.unit) {
+              return sum;
+            }
+            return sum + convertArea(plot.plotArea.value, plot.plotArea.unit, 'sqft');
+          } catch (error) {
+            console.error('Error converting plot area:', error);
+            return sum;
+          }
+        }, 0);
+      return totalAreaInSqft - usedArea;
+    } catch (error) {
+      console.error('Error calculating remaining area:', error);
+      return 0;
+    }
   };
 
   const getFilteredPlots = (plots: PlotDetails[]) => {
-    return plots.filter(plot => {
+    return (plots || []).filter(plot => {
       const matchesStatus = statusFilter === 'all' || plot.status === statusFilter;
       const matchesPossession = possessionFilter === 'all' || 
         (possessionFilter === 'available' ? plot.possession : !plot.possession);
-      const hasBalance = plot.sellingDetails.balance > 0 || plot.purchaseDetails.balance > 0;
+      const hasBalance = (plot.sellingDetails?.balance || 0) > 0 || (plot.purchaseDetails?.balance || 0) > 0;
       const matchesBalance = balanceFilter === 'all' || 
         (balanceFilter === 'pending' ? hasBalance : !hasBalance);
+      const matchesTransaction = transactionFilter === 'all' || plot.transactionType === transactionFilter;
       
-      return matchesStatus && matchesPossession && matchesBalance;
+      return matchesStatus && matchesPossession && matchesBalance && matchesTransaction;
     });
   };
 
@@ -115,8 +170,7 @@ const AdminDashboard: React.FC = () => {
 
   const handlePlotEdit = (plot: PlotDetails) => {
     setSelectedPlot(plot);
-    // TODO: Implement edit modal
-    alert('Edit functionality coming soon! For now, you can delete and recreate plots.');
+    setShowForm(true);
   };
 
   const handlePlotDelete = (plotId: string) => {
@@ -135,6 +189,21 @@ const AdminDashboard: React.FC = () => {
     alert('Plot deleted successfully!');
   };
 
+  const handleDeleteLand = (landId: string) => {
+    if (!window.confirm('Are you sure you want to delete this entire land record? This action cannot be undone.')) {
+      return;
+    }
+
+    setLandRecords(prev => prev.filter(land => land.id !== landId));
+    
+    // If the deleted land was selected, clear selection
+    if (selectedLand?.id === landId) {
+      setSelectedLand(null);
+    }
+    
+    alert('Land record deleted successfully!');
+  };
+
   return (
     <div className="space-y-6">
       {showExtendSuccess && (
@@ -150,7 +219,7 @@ const AdminDashboard: React.FC = () => {
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
-          ⚠️ Session expiring in {remainingTime} minutes! Please extend your session or save your work.
+          ⚠️ Session expiring in {remainingTime || 0} minutes! Please extend your session or save your work.
         </div>
       )}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 text-white">
@@ -167,7 +236,7 @@ const AdminDashboard: React.FC = () => {
                 </svg>
                 <span className={`${remainingTime < 10 ? 'text-yellow-300 font-semibold' : 'text-blue-200'} text-sm`}>
                   {remainingTime < 10 ? '⚠️ Session expiring soon! ' : ''}
-                  Session expires in {remainingTime} minutes
+                  Session expires in {remainingTime || 0} minutes
                 </span>
               </div>
             </div>
@@ -179,7 +248,7 @@ const AdminDashboard: React.FC = () => {
             >
               + Add New Land
             </button>
-            {remainingTime < 15 && (
+            {(remainingTime || 0) < 15 && (
               <button
                 onClick={handleExtendSession}
                 className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold shadow-lg transition-all transform hover:scale-105 animate-pulse"
@@ -201,16 +270,28 @@ const AdminDashboard: React.FC = () => {
         {/* Land Records List */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              Land Records ({landRecords.length})
-            </h2>
-            <div className="space-y-3">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Land Records ({landRecords.length})
+              </h2>
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-semibold"
+                title="Open User Site in new tab"
+              >
+                View User Site
+              </a>
+            </div>
+            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {landRecords.map(land => {
                 const remainingArea = calculateRemainingArea(land);
-                const usagePercentage = ((land.totalArea.value * convertArea(1, land.totalArea.unit, 'sqft') - remainingArea) / (land.totalArea.value * convertArea(1, land.totalArea.unit, 'sqft'))) * 100;
+                const totalAreaInSqft = land.totalArea?.value ? land.totalArea.value * convertArea(1, land.totalArea.unit, 'sqft') : 0;
+                const usagePercentage = totalAreaInSqft > 0 ? ((totalAreaInSqft - remainingArea) / totalAreaInSqft) * 100 : 0;
                 
                 return (
                   <div
@@ -225,32 +306,46 @@ const AdminDashboard: React.FC = () => {
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="font-bold text-lg text-gray-900">{land.landNumber}</h3>
-                        <p className="text-sm text-gray-500">{land.plots.length} plots</p>
+                        <p className="text-sm text-gray-500">{(land.plots || []).length} plots</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        selectedLand?.id === land.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {selectedLand?.id === land.id ? 'Selected' : 'Select'}
-                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteLand(land.id);
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete Land"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          selectedLand?.id === land.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {selectedLand?.id === land.id ? 'Selected' : 'Select'}
+                        </span>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Total Area:</span>
-                        <span className="font-semibold text-gray-900">{land.totalArea.value} {land.totalArea.unit}</span>
+                        <span className="font-semibold text-gray-900">{land.totalArea?.value || 0} {land.totalArea?.unit || 'sqft'}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Remaining:</span>
-                        <span className="font-semibold text-green-600">{remainingArea.toFixed(2)} sqft</span>
+                        <span className="font-semibold text-green-600">{(remainingArea || 0).toFixed(2)} sqft</span>
                       </div>
                       <div className="mt-2">
                         <div className="flex justify-between text-xs text-gray-600 mb-1">
                           <span>Usage</span>
-                          <span>{usagePercentage.toFixed(1)}%</span>
+                          <span>{(usagePercentage || 0).toFixed(1)}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
                             className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
-                            style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                            style={{ width: `${Math.min(Math.max(usagePercentage || 0, 0), 100)}%` }}
                           />
                         </div>
                       </div>
@@ -290,12 +385,12 @@ const AdminDashboard: React.FC = () => {
                     <div>
                       <span className="text-sm font-medium text-gray-500">Total Area:</span>
                       <p className="text-lg font-semibold text-gray-900">
-                        {selectedLand.totalArea.value} {selectedLand.totalArea.unit}
+                        {selectedLand.totalArea?.value || 0} {selectedLand.totalArea?.unit || 'sqft'}
                       </p>
                     </div>
                     <div>
                       <span className="text-sm font-medium text-gray-500">Total Plots:</span>
-                      <p className="text-lg font-semibold text-gray-900">{selectedLand.plots.length}</p>
+                      <p className="text-lg font-semibold text-gray-900">{(selectedLand.plots || []).length}</p>
                     </div>
                     <div>
                       <span className="text-sm font-medium text-gray-500">Remaining Area:</span>
@@ -316,7 +411,7 @@ const AdminDashboard: React.FC = () => {
                     </svg>
                     Filter Plots
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                       <select
@@ -328,6 +423,19 @@ const AdminDashboard: React.FC = () => {
                         <option value="open">Open</option>
                         <option value="booked">Booked</option>
                         <option value="sold">Sold</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
+                      <select
+                        value={transactionFilter}
+                        onChange={(e) => setTransactionFilter(e.target.value as any)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="all">All Types</option>
+                        <option value="sold">Sold</option>
+                        <option value="purchased">Purchased</option>
+                        <option value="both">Both</option>
                       </select>
                     </div>
                     <div>
@@ -361,7 +469,7 @@ const AdminDashboard: React.FC = () => {
               {/* Plots List with Add Button */}
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">Plots ({selectedLand.plots.length})</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Plots ({(selectedLand.plots || []).length})</h3>
                   <button
                     onClick={() => setShowForm(true)}
                     className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg transition-all transform hover:scale-105"
@@ -370,7 +478,7 @@ const AdminDashboard: React.FC = () => {
                   </button>
                 </div>
                 <LandList
-                  plots={getFilteredPlots(selectedLand.plots)}
+                  plots={getFilteredPlots(selectedLand.plots || [])}
                   onPlotSelect={handlePlotSelect}
                   onPlotEdit={handlePlotEdit}
                   onPlotDelete={handlePlotDelete}
@@ -468,8 +576,13 @@ const AdminDashboard: React.FC = () => {
           <div className="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-lg bg-white">
             <LandForm
               onSubmit={handleAddPlot}
-              onCancel={() => setShowForm(false)}
+              onCancel={() => {
+                setShowForm(false);
+                setSelectedPlot(null);
+              }}
               remainingArea={calculateRemainingArea(selectedLand)}
+              initialData={selectedPlot || undefined}
+              isEdit={!!selectedPlot}
             />
           </div>
         </div>

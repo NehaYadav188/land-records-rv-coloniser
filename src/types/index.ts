@@ -34,6 +34,7 @@ export interface PlotDetails {
     unit: AreaUnit;
   };
   status: 'sold' | 'booked' | 'open';
+  transactionType?: 'sold' | 'purchased' | 'both';
   possession: boolean;
   miscellaneous: {
     type: 'disputed' | 'normal' | 'optional';
