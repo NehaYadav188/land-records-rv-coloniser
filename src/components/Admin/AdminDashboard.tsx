@@ -191,7 +191,7 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               {/* Prominent User Site Button */}
               <button
-                onClick={() => window.location.href = 'https://nehayadav188.github.io/land-records-rv-coloniser/'}
+                onClick={() => window.location.href = '/land-records-rv-coloniser/'}
                 className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-lg font-bold hover:from-emerald-600 hover:to-green-700 transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

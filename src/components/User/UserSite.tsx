@@ -145,8 +145,8 @@ Financial Advice & Loan Information
 • Call: ${callNumber}
 
 *🌐 Links:*
-• User Site: ${window.location.origin}
-• Admin Portal: ${window.location.origin}/#/admin`;
+• User Site: /land-records-rv-coloniser/
+• Admin Portal: /land-records-rv-coloniser/#/admin`;
       
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.location.href = whatsappUrl;
@@ -222,7 +222,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAuthenticated && (
-                <button onClick={() => window.location.href = '/#/admin'} className="hover:text-emerald-200 transition-colors">
+                <button onClick={() => window.location.href = '/land-records-rv-coloniser/#/admin'} className="hover:text-emerald-200 transition-colors">
                   Admin Portal
                 </button>
               )}
@@ -253,7 +253,7 @@ Financial Advice & Loan Information
                 Financial Advice
               </button>
               {isAuthenticated && (
-                <button onClick={() => { window.location.href = '/#/admin'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
+                <button onClick={() => { window.location.href = '/land-records-rv-coloniser/#/admin'; setMobileMenuOpen(false); }} className="block w-full text-left py-2 px-4 hover:bg-emerald-700 rounded">
                   Admin Portal
                 </button>
               )}
@@ -692,7 +692,7 @@ Financial Advice & Loan Information
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-gray-400 hover:text-white transition-colors">🏠 Properties</button></li>
                 {isAuthenticated && (
-                  <li><button onClick={() => window.location.href = '/#/admin'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
+                  <li><button onClick={() => window.location.href = '/land-records-rv-coloniser/#/admin'} className="text-gray-400 hover:text-white transition-colors">🔐 Admin Portal</button></li>
                 )}
                 <li><button onClick={() => handleContact('financial')} className="text-gray-400 hover:text-white transition-colors">💼 Financial Advice</button></li>
                 <li><button onClick={() => window.location.href = 'https://wa.me/9415058167'} className="text-gray-400 hover:text-white transition-colors">💬 WhatsApp Support</button></li>

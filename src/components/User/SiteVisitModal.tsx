@@ -60,8 +60,8 @@ const SiteVisitModal: React.FC<SiteVisitModalProps> = ({ plot, onClose }) => {
 • Call: 9161811113
 
 *🌐 Quick Links:*
-• User Site: ${window.location.origin}
-• Admin Portal: ${window.location.origin}/#/admin
+• User Site: /land-records-rv-coloniser/
+• Admin Portal: /land-records-rv-coloniser/#/admin
 
 ---
 *This is a site visit request from RV Coloniser website. Please contact the customer to schedule the visit.*`;
