@@ -68,7 +68,7 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea, 
         }
       }));
     }
-  }, [formData.sellingDetails.value, formData.sellingDetails.creditedAmount]);
+  }, [formData.sellingDetails.value, formData.sellingDetails.creditedAmount, formData.sellingDetails.balance]);
 
   // Auto-calculate balance for purchase details
   useEffect(() => {
@@ -85,7 +85,7 @@ const LandForm: React.FC<LandFormProps> = ({ onSubmit, onCancel, remainingArea, 
         }
       }));
     }
-  }, [formData.purchaseDetails.value, formData.purchaseDetails.debitedAmount]);
+  }, [formData.purchaseDetails.value, formData.purchaseDetails.debitedAmount, formData.purchaseDetails.balance]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
